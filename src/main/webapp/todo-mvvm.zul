@@ -1,0 +1,50 @@
+<window
+	apply="org.zkoss.bind.BindComposer"
+	viewModel="@id('vm') @init('com.github.akihiro4chawon.mongodb.viewmodel.SimpleTodoViewModel')"
+  	validationMessages="@id('vmsgs')"
+  	title="Simple Todo MVVM application with mongoDB Java driver"
+  	width="640px"
+  	border="normal">
+	<listbox
+		id="tasks"
+		multiple="true"
+		rows="10"
+		model="@bind(vm.tasks)"
+		selectedItem="@bind(vm.selectedTask)">
+		<listhead>
+			<listheader label="Item" sort="auto(name)" />
+			<listheader label="Priority" width="50px" sort="auto(priority)" />
+			<listheader label="Date" width="90px" sort="auto(executionDate)" />
+		</listhead>
+		<template name="model" var="task">
+			<listitem value="@load(task)">
+				<listcell label="@load(task.name)" />
+				<listcell label="@load(task.priority)" />
+				<listcell label="@load(task.executionDate)" />
+			</listitem>
+		</template>
+	</listbox>
+	<groupbox
+		id="group"
+		form="@id('task') @load(vm.selectedTask) @save(vm.selectedTask, before='update') @save(vm.newTask, before='add') @validator('com.github.akihiro4chawon.mongodb.validator.SimpleTodoValidator')">
+		<caption label="Task" />
+		Item:
+		<textbox id="txtName" cols="25" value="@bind(task.name)" />
+		Priority:
+		<intbox id="txtPriority" cols="1" value="@bind(task.priority)" />
+		Date:
+		<datebox id="date" cols="8" value="@bind(task.executionDate)" />
+		<button id="add" label="Add" onClick="@command('add')" />
+		<button id="update" label="Update" onClick="@command('update')"
+			disabled="@load(empty vm.selectedTask)" />
+		<button id="delete" label="Delete" onClick="@command('delete')"
+			disabled="@load(empty vm.selectedTask)" />
+
+		<hlayout>
+			<label style="color:red" value="@load(vmsgs['name'])" />
+			<label style="color:red" value="@load(vmsgs['priority'])" />
+			<label style="color:red" value="@load(vmsgs['executionDate'])" />
+		</hlayout>
+
+	</groupbox>
+</window>
