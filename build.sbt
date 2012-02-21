@@ -13,7 +13,7 @@ version := "0.0.1"
 libraryDependencies ++= Seq(
   "org.zkoss.zk" % "zk" % "6.0.0",
   "org.zkoss.zk" % "zkbind" % "6.0.0",
-  "org.mongodb" % "mongo-java-driver" % "2.6.5",
+  "com.google.code.morphia" % "morphia" % "0.99",
   "org.mortbay.jetty" % "jetty" % "6.1.22" % "container",
   "org.eclipse.jetty" % "jetty-server" % "7.4.5.v20110725",
   "org.eclipse.jetty" % "jetty-servlet" % "7.4.5.v20110725",
@@ -25,3 +25,4 @@ resolvers += "ZK CE" at "http://mavensync.zkoss.org/maven2"
 
 resolvers += "Jetty Repo" at "http://repository.codehaus.org"
 
+resolvers += "Morphia Repo" at "http://morphia.googlecode.com/svn/mavenrepo/"

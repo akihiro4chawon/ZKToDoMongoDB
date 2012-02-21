@@ -6,6 +6,7 @@ import java.util.UUID
 
 import com.github.akihiro4chawon.mongodb.dao.TaskDAO
 import com.github.akihiro4chawon.mongodb.model.Task
+import com.github.akihiro4chawon.mongodb.MongoDBManager
 
 import org.zkoss.zk.ui.Component
 import org.zkoss.zk.ui.event.Event
@@ -28,11 +29,11 @@ class SimpleTodoController extends GenericForwardComposer[Window] {
   private var priority: Intbox = _
   private var date: Datebox = _
 
-  private val taskDao = new TaskDAO
+  private val taskDao = new TaskDAO(MongoDBManager.getMongo(), MongoDBManager.getMorphia())
   
   override def doAfterCompose(comp: Window) {
     super.doAfterCompose(comp)
-    tasks.setModel(new ListModelList(taskDao.findAll))
+    tasks.setModel(new ListModelList(taskDao.find.asList))
     tasks.setItemRenderer(new ListitemRenderer[Task] {
       def render(item: Listitem, task: Task, index: Int) {
         val fmt = new SimpleDateFormat("yyyy-MM-dd")
@@ -52,9 +53,13 @@ class SimpleTodoController extends GenericForwardComposer[Window] {
   }
   
   def onClick$add(evt: Event) {
-    val newTask = Task(UUID.randomUUID().toString(), name.getValue(), priority.getValue(), date.getValue());
-    taskDao.insert(newTask);
-    tasks.setModel(new ListModelList(taskDao.findAll()))
+    val newTask = Task()
+    newTask.setName(name.getValue)
+    newTask.setPriority(priority.getValue)
+    newTask.setExecutionDate(date.getValue)
+    
+    taskDao.save(newTask)
+    tasks.setModel(new ListModelList(taskDao.find().asList()))
   }
   
   def onClick$update() {
@@ -63,15 +68,15 @@ class SimpleTodoController extends GenericForwardComposer[Window] {
     task.setPriority(priority.getValue.asInstanceOf[Int])
     task.setExecutionDate(date.getValue.asInstanceOf[Date])
     
-    taskDao.update(task)
-    tasks.setModel(new ListModelList(taskDao.findAll()))
+    taskDao.save(task)
+    tasks.setModel(new ListModelList(taskDao.find().asList()))
   }
   
   def onClick$delete() {
     val task = tasks.getSelectedItem.getValue[Task]
     if (task != null) {
       taskDao.delete(task)
-      tasks.setModel(new ListModelList(taskDao.findAll()))
+      tasks.setModel(new ListModelList(taskDao.find().asList()))
     }
   }
 }
