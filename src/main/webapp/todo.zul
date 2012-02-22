@@ -1,4 +1,5 @@
-<window title="Simple Todo application with mongoDB Java driver" width="640px" border="normal" apply="com.github.akihiro4chawon.mongodb.controller.SimpleTodoController">
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+<window title="Simple Todo application with mongoDB via Spring" width="640px" border="normal" apply="${todoCtrl}">
 	<listbox id="tasks" multiple="true" rows="10">
 		<listhead>
 			<listheader label="Item" />

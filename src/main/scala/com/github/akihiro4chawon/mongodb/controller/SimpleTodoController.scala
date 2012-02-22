@@ -4,11 +4,13 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.UUID
 
-import com.github.akihiro4chawon.mongodb.dao.TaskDAO
-import com.github.akihiro4chawon.mongodb.model.Task
-import com.github.akihiro4chawon.mongodb.MongoDBManager
+import javax.annotation.Resource
 
-import org.zkoss.zk.ui.Component
+import org.springframework.context.annotation.Scope
+
+import com.github.akihiro4chawon.mongodb.model.Task
+import com.github.akihiro4chawon.mongodb.service.TaskService
+
 import org.zkoss.zk.ui.event.Event
 import org.zkoss.zk.ui.event.SelectEvent
 import org.zkoss.zk.ui.util.GenericForwardComposer
@@ -22,6 +24,8 @@ import org.zkoss.zul.ListitemRenderer
 import org.zkoss.zul.Textbox
 import org.zkoss.zul.Window
 
+@org.springframework.stereotype.Component("todoCtrl")
+@Scope("prototype")
 class SimpleTodoController extends GenericForwardComposer[Window] {
   // autowired by ZK
   private var tasks: Listbox = _
@@ -29,11 +33,12 @@ class SimpleTodoController extends GenericForwardComposer[Window] {
   private var priority: Intbox = _
   private var date: Datebox = _
 
-  private val taskDao = new TaskDAO(MongoDBManager.getMongo(), MongoDBManager.getMorphia())
+  @Resource(name="taskService")
+  private var taskService: TaskService = _
   
   override def doAfterCompose(comp: Window) {
     super.doAfterCompose(comp)
-    tasks.setModel(new ListModelList(taskDao.find.asList))
+    tasks.setModel(new ListModelList(taskService.findAll()))
     tasks.setItemRenderer(new ListitemRenderer[Task] {
       def render(item: Listitem, task: Task, index: Int) {
         val fmt = new SimpleDateFormat("yyyy-MM-dd")
@@ -53,13 +58,14 @@ class SimpleTodoController extends GenericForwardComposer[Window] {
   }
   
   def onClick$add(evt: Event) {
-    val newTask = Task()
-    newTask.setName(name.getValue)
-    newTask.setPriority(priority.getValue)
-    newTask.setExecutionDate(date.getValue)
+    val newTask = Task(
+        UUID.randomUUID().toString,
+        name.getValue,
+        priority.getValue,
+        date.getValue)    
     
-    taskDao.save(newTask)
-    tasks.setModel(new ListModelList(taskDao.find().asList()))
+    taskService.add(newTask)
+    tasks.setModel(new ListModelList(taskService.findAll()))
   }
   
   def onClick$update() {
@@ -68,15 +74,15 @@ class SimpleTodoController extends GenericForwardComposer[Window] {
     task.setPriority(priority.getValue.asInstanceOf[Int])
     task.setExecutionDate(date.getValue.asInstanceOf[Date])
     
-    taskDao.save(task)
-    tasks.setModel(new ListModelList(taskDao.find().asList()))
+    taskService.update(task)
+    tasks.setModel(new ListModelList(taskService.findAll()))
   }
   
   def onClick$delete() {
     val task = tasks.getSelectedItem.getValue[Task]
     if (task != null) {
-      taskDao.delete(task)
-      tasks.setModel(new ListModelList(taskDao.find().asList()))
+      taskService.delete(task)
+      tasks.setModel(new ListModelList(taskService.findAll()))
     }
   }
 }

@@ -1,9 +1,12 @@
-target
+target/
 
 .target
 .project
 .classpath
 .cache
 .settings
+
+.idea/
+.idea_modules/
 
 tmp/

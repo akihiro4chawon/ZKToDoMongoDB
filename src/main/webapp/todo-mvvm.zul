@@ -1,3 +1,4 @@
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
 <window
 	apply="org.zkoss.bind.BindComposer"
 	viewModel="@id('vm') @init('com.github.akihiro4chawon.mongodb.viewmodel.SimpleTodoViewModel')"

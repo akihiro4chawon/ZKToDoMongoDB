@@ -1,45 +1,46 @@
 package com.github.akihiro4chawon.mongodb.viewmodel
 
-import java.util.List
-import java.util.UUID
-
-import com.github.akihiro4chawon.mongodb.dao.TaskDAO
-import com.github.akihiro4chawon.mongodb.model.Task
-import com.github.akihiro4chawon.mongodb.MongoDBManager
+import javax.annotation.Resource
 
 import org.zkoss.bind.annotation.Command
 import org.zkoss.bind.annotation.NotifyChange
+import org.zkoss.zk.ui.select.annotation.WireVariable
 
 import scala.reflect.BeanProperty
 
+import com.github.akihiro4chawon.mongodb.model.Task
+import com.github.akihiro4chawon.mongodb.service.TaskService
+
 class SimpleTodoViewModel {
-  private val taskDao = new TaskDAO(MongoDBManager.getMongo(), MongoDBManager.getMorphia())
-  
+  @WireVariable
+  private var taskService: TaskService = _
+
   @BeanProperty var selectedTask: Task = _
   @BeanProperty var newTask = new Task()
   
-  def getTasks = taskDao.find.asList
+  def getTasks = taskService.findAll()
 
   @Command(Array("add"))
   @NotifyChange(Array("tasks"))
   def add() {
-    taskDao.save(newTask)
+    taskService.add(newTask)
     newTask = new Task()
   }
   
   @Command(Array("update"))
   @NotifyChange(Array("tasks"))
   def update() {
-    taskDao.save(selectedTask)
+    taskService.update(selectedTask)
   }
   
   @Command(Array("delete"))
   @NotifyChange(Array("tasks", "selectedTask"))
   def delete() {
     if (selectedTask != null) {
-      taskDao.delete(selectedTask)
+      taskService.delete(selectedTask)
       selectedTask = null
     }
   }
 }
+
 
